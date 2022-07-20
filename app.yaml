@@ -28,7 +28,7 @@ spec:
     spec:
       containers:  
       - name: flask-test-app
-        image: docker.io/<username>/flask-kubernetes-app
+        image: docker.io/brunoilobinso/byondapp:latest
         imagePullPolicy: IfNotPresent
         ports:
           - containerPort: 5000
