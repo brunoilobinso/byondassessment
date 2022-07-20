@@ -1,0 +1,505 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    meta.helm.sh/release-name: byond01
+    meta.helm.sh/release-namespace: default
+  creationTimestamp: "2022-07-19T19:39:36Z"
+  generation: 1
+  labels:
+    app.kubernetes.io/component: master
+    app.kubernetes.io/instance: byond01
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    helm.sh/chart: redis-17.0.2
+  name: byond01-redis-master
+  namespace: default
+  resourceVersion: "2823"
+  uid: d336a4ee-3ef6-40af-b89c-e00432d2dce5
+spec:
+  podManagementPolicy: OrderedReady
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: master
+      app.kubernetes.io/instance: byond01
+      app.kubernetes.io/name: redis
+  serviceName: byond01-redis-headless
+  template:
+    metadata:
+      annotations:
+        checksum/configmap: 8498259de86fe1e417081e51bee5278aca04aade7c5b55801cbd045928631c02
+        checksum/health: 5d2db7cc2e402bdd9ee49bbc2472efeb6821c0b600bfb887ea4f7610ba68cdde
+        checksum/scripts: 2f8245e753114d9c61a782ade3693b75f0cf40369f9649bda89a1726d36d4bcc
+checksum/secret: 0536f2dd13e0899277568b829d5b3b1fcced3afe402efeb5f3f0aa66043bdaff
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/component: master
+        app.kubernetes.io/instance: byond01
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: redis
+        helm.sh/chart: redis-17.0.2
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: master
+                  app.kubernetes.io/instance: byond01
+                  app.kubernetes.io/name: redis
+              namespaces:
+              - default
+              topologyKey: kubernetes.io/hostname
+            weight: 1
+      containers:
+      - args:
+        - -c
+        - /opt/bitnami/scripts/start-scripts/start-master.sh
+        command:
+        - /bin/bash
+        env:
+        - name: BITNAMI_DEBUG
+          value: "false"
+        - name: REDIS_REPLICATION_MODE
+          value: master
+        - name: ALLOW_EMPTY_PASSWORD
+          value: "no"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: redis-password
+              name: byond01-redis
+        - name: REDIS_TLS_ENABLED
+          value: "no"
+        - name: REDIS_PORT
+          value: "6379"
+        image: docker.io/bitnami/redis:7.0.4-debian-11-r2
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - /health/ping_liveness_local.sh 5
+          failureThreshold: 5
+          initialDelaySeconds: 20
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 6
+        name: redis
+        ports:
+        - containerPort: 6379
+          name: redis
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - /health/ping_readiness_local.sh 1
+          failureThreshold: 5
+          initialDelaySeconds: 20
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 2
+        resources: {}
+        securityContext:
+          runAsUser: 1001
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /opt/bitnami/scripts/start-scripts
+          name: start-scripts
+        - mountPath: /health
+          name: health
+        - mountPath: /data
+          name: redis-data
+        - mountPath: /opt/bitnami/redis/mounted-etc
+          name: config
+        - mountPath: /opt/bitnami/redis/etc/
+          name: redis-tmp-conf
+        - mountPath: /tmp
+          name: tmp
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 1001
+      serviceAccount: byond01-redis
+      serviceAccountName: byond01-redis
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 493
+          name: byond01-redis-scripts
+        name: start-scripts
+      - configMap:
+          defaultMode: 493
+          name: byond01-redis-health
+        name: health
+      - configMap:
+          defaultMode: 420
+          name: byond01-redis-configuration
+        name: config
+      - emptyDir: {}
+        name: redis-tmp-conf
+      - emptyDir: {}
+        name: tmp
+  updateStrategy:
+    rollingUpdate:
+      partition: 0
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/component: master
+        app.kubernetes.io/instance: byond01
+        app.kubernetes.io/name: redis
+      name: redis-data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 8Gi
+      volumeMode: Filesystem
+    status:
+      phase: Pending
+status:
+  availableReplicas: 1
+  collisionCount: 0
+  currentReplicas: 1
+  currentRevision: byond01-redis-master-7d55bf6d  
+  observedGeneration: 1
+  readyReplicas: 1
+  replicas: 1
+  updateRevision: byond01-redis-master-7d55bf6d
+  updatedReplicas: 1
+
+---
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    meta.helm.sh/release-name: byond01
+    meta.helm.sh/release-namespace: default
+  creationTimestamp: "2022-07-19T19:39:36Z"
+  generation: 1
+  labels:
+    app.kubernetes.io/component: replica
+    app.kubernetes.io/instance: byond01
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    helm.sh/chart: redis-17.0.2
+  name: byond01-redis-replicas
+  namespace: default
+  resourceVersion: "2939"
+  uid: 78555055-bd58-4eec-8de0-ac4fa3c87d47
+spec:
+  podManagementPolicy: OrderedReady
+  replicas: 3
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: replica
+      app.kubernetes.io/instance: byond01
+      app.kubernetes.io/name: redis
+  serviceName: byond01-redis-headless
+  template:
+    metadata:
+      annotations:
+        checksum/configmap: 8498259de86fe1e417081e51bee5278aca04aade7c5b55801cbd045928631c02
+        checksum/health: 5d2db7cc2e402bdd9ee49bbc2472efeb6821c0b600bfb887ea4f7610ba68cdde
+        checksum/scripts: 2f8245e753114d9c61a782ade3693b75f0cf40369f9649bda89a1726d36d4bcc
+        checksum/secret: 6ddb072023f8ce9bd5baf7283ab556bfa836814893823561eb57e7024f0de6d7
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/component: replica
+        app.kubernetes.io/instance: byond01
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: redis
+        helm.sh/chart: redis-17.0.2
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/component: replica
+                  app.kubernetes.io/instance: byond01
+                  app.kubernetes.io/name: redis
+              namespaces:
+              - default
+              topologyKey: kubernetes.io/hostname
+            weight: 1
+      containers:
+      - args:
+        - -c
+        - /opt/bitnami/scripts/start-scripts/start-replica.sh
+        command:
+        - /bin/bash
+        env:
+        - name: BITNAMI_DEBUG
+          value: "false"
+        - name: REDIS_REPLICATION_MODE
+          value: slave
+        - name: REDIS_MASTER_HOST
+          value: byond01-redis-master-0.byond01-redis-headless.default.svc.cluster.local
+        - name: REDIS_MASTER_PORT_NUMBER
+          value: "6379"
+        - name: ALLOW_EMPTY_PASSWORD
+          value: "no"
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: redis-password
+              name: byond01-redis
+        - name: REDIS_MASTER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: redis-password
+              name: byond01-redis
+        - name: REDIS_TLS_ENABLED
+          value: "no"
+        - name: REDIS_PORT
+          value: "6379"
+        image: docker.io/bitnami/redis:7.0.4-debian-11-r2
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - /health/ping_liveness_local_and_master.sh 5
+          failureThreshold: 5
+          initialDelaySeconds: 20
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 6
+        name: redis
+        ports:
+        - containerPort: 6379
+          name: redis
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - /health/ping_readiness_local_and_master.sh 1
+          failureThreshold: 5
+          initialDelaySeconds: 20
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 2
+        resources: {}
+        securityContext:
+          runAsUser: 1001
+        startupProbe:
+          failureThreshold: 22
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          tcpSocket:
+            port: redis
+          timeoutSeconds: 5
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /opt/bitnami/scripts/start-scripts
+          name: start-scripts
+        - mountPath: /health
+          name: health
+        - mountPath: /data
+          name: redis-data
+        - mountPath: /opt/bitnami/redis/mounted-etc
+          name: config
+        - mountPath: /opt/bitnami/redis/etc
+          name: redis-tmp-conf
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        fsGroup: 1001
+      serviceAccount: byond01-redis
+      serviceAccountName: byond01-redis
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 493
+          name: byond01-redis-scripts
+        name: start-scripts
+      - configMap:
+          defaultMode: 493
+          name: byond01-redis-health
+        name: health
+      - configMap:
+          defaultMode: 420
+          name: byond01-redis-configuration
+        name: config
+      - emptyDir: {}
+        name: redis-tmp-conf
+  updateStrategy:
+    rollingUpdate:
+      partition: 0
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/component: replica
+        app.kubernetes.io/instance: byond01
+        app.kubernetes.io/name: redis
+      name: redis-data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 8Gi
+      volumeMode: Filesystem
+    status:
+      phase: Pending
+status:
+  availableReplicas: 3
+  collisionCount: 0
+  currentReplicas: 3
+  currentRevision: byond01-redis-replicas-9cc874f5
+  observedGeneration: 1
+  readyReplicas: 3
+  replicas: 3
+  updateRevision: byond01-redis-replicas-9cc874f5
+  updatedReplicas: 3
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    meta.helm.sh/release-name: byond01
+    meta.helm.sh/release-namespace: default
+  creationTimestamp: "2022-07-19T19:39:36Z"
+  labels:
+    app.kubernetes.io/instance: byond01
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    helm.sh/chart: redis-17.0.2
+  name: byond01-redis-headless
+  namespace: default
+  resourceVersion: "2724"
+  uid: db08e24e-29a7-42b0-8010-b689381adc87
+spec:
+  clusterIP: None
+  clusterIPs:
+  - None
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: tcp-redis
+    port: 6379
+    protocol: TCP
+    targetPort: redis
+  selector:
+    app.kubernetes.io/instance: byond01
+    app.kubernetes.io/name: redis
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    meta.helm.sh/release-name: byond01
+    meta.helm.sh/release-namespace: default
+  creationTimestamp: "2022-07-19T19:39:36Z"
+  labels:
+    app.kubernetes.io/component: replica
+    app.kubernetes.io/instance: byond01
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    helm.sh/chart: redis-17.0.2
+  name: byond01-redis-replicas
+  namespace: default
+  resourceVersion: "2725"
+  uid: b486827c-b4d4-4c47-af58-ffd5cf7e5b0e
+spec:
+  clusterIP: 10.109.56.96
+  clusterIPs:
+  - 10.109.56.96
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: tcp-redis
+    port: 6379
+    protocol: TCP
+    targetPort: redis
+  selector:
+    app.kubernetes.io/component: replica
+    app.kubernetes.io/instance: byond01
+    app.kubernetes.io/name: redis
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    meta.helm.sh/release-name: byond01
+    meta.helm.sh/release-namespace: default
+  creationTimestamp: "2022-07-19T19:39:36Z"
+  labels:
+    app.kubernetes.io/component: master
+    app.kubernetes.io/instance: byond01
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    helm.sh/chart: redis-17.0.2
+  name: byond01-redis-master
+  namespace: default
+  resourceVersion: "2727"
+  uid: 4ac5feed-c82d-4602-aae2-63e3b1639876
+spec:
+  clusterIP: 10.109.20.80
+  clusterIPs:
+  - 10.109.20.80
+  internalTrafficPolicy: Cluster
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - name: tcp-redis
+    port: 6379
+    protocol: TCP
+    targetPort: redis
+  selector:
+    app.kubernetes.io/component: master
+    app.kubernetes.io/instance: byond01
+    app.kubernetes.io/name: redis
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}
+
+...
+
