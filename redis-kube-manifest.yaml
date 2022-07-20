@@ -501,5 +501,24 @@ spec:
 status:
   loadBalancer: {}
 
-...
+---
 
+apiVersion: v1
+data:
+  redis-password: MExiZ1QzS2RDdA==
+kind: Secret
+metadata:
+  annotations:
+    meta.helm.sh/release-name: redis01
+    meta.helm.sh/release-namespace: default
+  creationTimestamp: "2022-07-19T15:53:05Z"
+  labels:
+    app.kubernetes.io/instance: redis01
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: redis
+    helm.sh/chart: redis-17.0.2
+  name: redis01
+  namespace: default
+  resourceVersion: "3592"
+  uid: f67d6eea-54aa-44be-8c29-bdd7ea017b89
+type: Opaque
